@@ -7,7 +7,7 @@ name = "ndplot"
 version = "0.1.0"
 description = "A tool to perform n-dimensional plots from a collection of figures."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.14"
 license = "GPL-3.0-or-later"
 license-files = ["LICEN[CS]E*"]
 keywords = ["plot", "visualization", "n dimensional", "multi dimensional", "sliders"]
@@ -35,4 +35,4 @@ Repository = "https://github.com/me/ndplot.git"
 # Changelog = "https://github.com/me/ndplot/blob/master/CHANGELOG.md"
 
 [project.scripts]
-carwash = "ndplot:cli"
+ndplot = "ndplot:cli"
