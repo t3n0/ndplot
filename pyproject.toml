@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ndplot"
+version = "0.1.0"
+description = "A tool to perform n-dimensional plots from a collection of figures."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+keywords = ["plot", "n-dimensional", "multi-dimensional", "sliders"]
+authors = [
+    {name = "Stefano Dal Forno", email = "tenobaldi@gmail.com"},
+    ]
+maintainers = [
+    {name = "Stefano Dal Forno", email = "tenobaldi@gmail.com"}
+    ]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python"
+    ]
+
+dependencies = [
+    "matplotlib",
+    ]
+
+# dynamic = ["version", "description"]
+
+[project.urls]
+# Homepage = "https://example.com"
+# Documentation = "https://readthedocs.org"
+Repository = "https://github.com/me/ndplot.git"
+# Changelog = "https://github.com/me/ndplot/blob/master/CHANGELOG.md"
+
+[project.scripts]
+carwash = "ndplot:cli"
