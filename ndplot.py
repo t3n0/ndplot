@@ -14,23 +14,16 @@ from sys import exit, stderr
 # import numpy as np
 
 @lru_cache(maxsize=256)
-def load_image(path):
-    '''
-    Load image using PIL. This is convenient over plt.imread() or others because the image is *lazy* loaded.
-    On top of this, the decorator saves the image on the cache for later quicker access.
-    
-    Parameters
-
-    path: str
-        image path
-    
-    Returns
-        image: PIL.Image
-    '''
+def loadImage(path):
+    # This loads an image using the PIL library.
+    # It is convenient over, e.g., plt.imread() because the image is *lazy* loaded.
+    # On top of this, the decorator saves the image on the cache for later quicker access.
     img = Image.open(path).convert("RGBA")
     return img
 
 def getDirectory():
+    # This returns the directory containing the figures.
+    # Also, it checks for its existence and provides a nice argparse interface.
     parser = ArgumentParser(
         prog = "ndplot",
         description = "A tool to perform n-dimensional plots from a collection of figures.")
@@ -43,53 +36,31 @@ def getDirectory():
         print(f"Directory `{args.directory}` not found.", file=stderr)
         exit(1)
 
-# IMG_FOLDER = 'figs'
-# file_name = 'fig_p0=0_p1=0_p2=0.png'
+def loadParameters(DIR):
+    # This funciton defines a dictionary that couples a parameter tuple to a image file name.
+    # For example: dict[ (1.3, 45, -3, 0.5) ] = 'p1=1.3_p2=45_p3=-3_p4=0.5.png'
+
+    # regex to identify a valid filename
+    # <par1>_<par2>_..._<parN>.[png|jpg|gif]
+    # e.g. `amp1=3_p1=-3.1_g23=10.png`
+    filenameRegex = re.compile( r"([a-zA-Z]+[0-9]*=[-+]?\d*\.?\d+)(\_[a-zA-Z]+[0-9]*=[-+]?\d*\.?\d+)*\.(png|jpg|gif)$" )
+
+    # regex to identify all parameters in the filename
+    # <par>=<value>
+    # e.g. `amp4=+1.37`
+    parameterRegex = re.compile( r"[a-zA-Z]+[0-9]*=([-+]?\d*\.?\d+)" )
+
+    parameterDict = {}
+    for filename in sorted(os.listdir(DIR)):
+        matched = filenameRegex.search(filename) # this returns a match object (or None)
+        if matched:
+            parameters = parameterRegex.findall(filename) # findall returns a list e.g. ['3', '-0.5', '3.14']
+            parameterDict[tuple(parameters)] = filename
+    return parameterDict
 
 # img = load_image(os.path.join(IMG_FOLDER, file_name))
 # ax.imshow(img)
 # plt.show()
-
-# example filename
-file_name = 'ampolla=1.0_g1=-3_g2=.5_k0=+3.14.png'
-
-# regex to identify all parameters in the filename
-# <par>=<value>
-# e.g. `amp4=+1.37`
-regex_params = r"""
-# group 1
-(
-[a-zA-Z]+[0-9]*    # name of the parameter, at least one char and optional numbers
-)
-=                  # equal sign
-# group 2
-(
-[-+]?              # optional plus or minus signs
-\d*                # optional first digits
-\.?                # optional floating point
-\d+                # at least one significant digit
-)
-"""
-
-# regex to identify a valid filename
-# <par1>_<par2>_..._<parN>.[png|jpg|gif]
-# e.g. `amp1=3_p1=-3.1_p2=10.png`
-regex_filename = r"^([a-zA-Z]+[0-9]*=[-+]?\d*\.?\d+)(\_[a-zA-Z]+[0-9]*=[-+]?\d*\.?\d+)*\.(png|jpg|gif)$"
-
-regex_params_compiled = re.compile(regex_params, re.VERBOSE)
-regex_filename_compiled = re.compile(regex_filename)
-
-params = regex_params_compiled.findall(file_name)
-fname = regex_filename_compiled.match(file_name)
-
-# print(fname)
-# print(fname.group())
-# print(fname.span())
-
-# print('\nparameters')
-# for par, val in params:
-#     print(f' {par:5.5s} = {float(val):+.2f}')
-
 
 # command line interface entry point for the `ndplot` script
 def cli():
@@ -100,7 +71,7 @@ def cli():
     # ax.set_position([0.25, 0.02, 0.73, 0.97])
     # ax.axis('off')
 
-    print(DIR)
+    loadParameters(DIR)
 
 if __name__ == "__main__":
     cli()
