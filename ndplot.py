@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import re, os
 from sys import exit, stderr
 from matplotlib.widgets import Slider
-# import numpy as np
+import numpy as np
 
 @lru_cache(maxsize=256)
 def loadImage(path):
@@ -52,15 +52,32 @@ def loadParameters(DIR):
     parameterRegex = re.compile( r"[a-zA-Z]+[0-9]*=([-+]?\d*\.?\d+)" )
 
     parameterDict = {}
+    values = []
     for filename in sorted(os.listdir(DIR)):
         matched = filenameRegex.search(filename) # this returns a match object (or None)
         if matched:
-            parameters = parameterRegex.findall(filename) # findall returns a list e.g. ['3', '-0.5', '3.14']
-            parameterDict[tuple(parameters)] = filename
+            parameters = parameterRegex.findall(filename) # this is a list e.g.      ['3', '-0.5', '3.14']
+            val = tuple([float(p) for p in parameters])   # cast to float, e.g.       (3.0, -0.5, 3.14)
+            values.append(val)                            # list of parameters, e.g. [[3.0, -0.5, 3.14], [...], ...]
+            parameterDict[val] = filename 
     if not parameterDict:
         print("No matching images found.", file=stderr)
         exit(1)
-    return parameterDict
+    values = np.asarray(values)
+    rangeValues = [np.unique(values[:, i]) for i in range(values.shape[1])]
+    return parameterDict, values, rangeValues
+
+def initSliders(vals, rangeVals, nParams):
+    # This draws the slider axes and objects based on the loaded parameters.
+    sliders = []
+    slider_height = 0.06
+    start = 0.95
+    for i in range(nParams):
+        tmp_ax = plt.axes([0.03, start - i*slider_height, 0.2, 0.04])
+        # Use Slider but snap selection manually in callback
+        s = Slider(tmp_ax, f"p{i}", rangeVals[i].min(), rangeVals[i].max(), valinit=vals[0,i])
+        sliders.append(s)
+    return sliders
 
 # img = load_image(os.path.join(IMG_FOLDER, file_name))
 # ax.imshow(img)
@@ -69,7 +86,10 @@ def loadParameters(DIR):
 # command line interface entry point for the `ndplot` script
 def cli():
     DIR = getDirectory()
-    dic = loadParameters(DIR)
+    dic, vals, rangeVals = loadParameters(DIR)
+    nParams = vals.shape[1]
+
+    # print(rangeVals[0].max())
 
     # prepare figure
     fig, ax = plt.subplots(figsize=(8,5))
@@ -77,14 +97,7 @@ def cli():
     ax.axis('off')
 
     # create sliders
-    sliders = []
-    slider_height = 0.06
-    start = 0.95
-    for i in range(3):
-        tmp_ax = plt.axes([0.03, start - i*slider_height, 0.2, 0.04])
-        # Use Slider but snap selection manually in callback
-        s = Slider(tmp_ax, f"p{i}", 0, 10, valinit=5, valstep=1.0)
-        sliders.append(s)
+    sliders = initSliders(vals, rangeVals, nParams)
     
     def update(val=None):
         pass

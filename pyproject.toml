@@ -22,9 +22,9 @@ classifiers = [
     "Programming Language :: Python"
     ]
 
-# dependencies = [
-#     "matplotlib",
-#     ]
+dependencies = [
+    "matplotlib",
+    ]
 
 # dynamic version
 dynamic = ["version"]
