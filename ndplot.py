@@ -5,12 +5,12 @@ A tool to perform n-dimensional plot from a collection of figures
 
 __version__ = 0.1
 
-import os
+# import os
 import re
 from PIL import Image
-import numpy as np
+# import numpy as np
 from functools import lru_cache
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import argparse
 
 
@@ -96,3 +96,6 @@ fname = regex_filename_compiled.match(file_name)
 args = getArgs()
 
 print(args)
+
+def cli():
+    print('pollo')
