@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ndplot"
-version = "0.1.0"
+# version = "0.1.0"
 description = "A tool to perform n-dimensional plots from a collection of figures."
 readme = "README.md"
 requires-python = ">=3.14"
@@ -25,6 +25,11 @@ classifiers = [
 dependencies = [
     "matplotlib",
     ]
+
+# dynamic version
+dynamic = ["version"]
+[tool.setuptools.dynamic]
+version = {attr = "ndplot.__version__"}
 
 [project.urls]
 # Homepage = "https://example.com"
