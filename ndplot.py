@@ -71,7 +71,8 @@ def cli():
     # ax.set_position([0.25, 0.02, 0.73, 0.97])
     # ax.axis('off')
 
-    loadParameters(DIR)
+    dic = loadParameters(DIR)
+    print(dic)
 
 if __name__ == "__main__":
     cli()
