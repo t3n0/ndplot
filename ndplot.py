@@ -5,15 +5,13 @@ A tool to perform n-dimensional plot from a collection of figures
 
 __version__ = 0.1
 
-# import os
-import re
-from PIL import Image
-# import numpy as np
 from functools import lru_cache
-# import matplotlib.pyplot as plt
-import argparse
-
-
+from PIL import Image
+from argparse import ArgumentParser
+import matplotlib.pyplot as plt
+import re, os
+from sys import exit, stderr
+# import numpy as np
 
 @lru_cache(maxsize=256)
 def load_image(path):
@@ -32,19 +30,18 @@ def load_image(path):
     img = Image.open(path).convert("RGBA")
     return img
 
-def getArgs():
-    parser = argparse.ArgumentParser(
+def getDirectory():
+    parser = ArgumentParser(
         prog = "ndplot",
         description = "A tool to perform n-dimensional plots from a collection of figures.")
-    
     parser.add_argument("-d", "--directory", default='.', help="Directory containing the figures, the default is the current directory.")
     parser.add_argument('-v', '--version', action='version', version=f'%(prog)s {__version__}')
-    return parser.parse_args()
-
-# prepare figure
-# fig, ax = plt.subplots(figsize=(8,5))
-# ax.set_position([0.25, 0.02, 0.73, 0.97])
-# ax.axis('off')
+    args = parser.parse_args()
+    if os.path.isdir(args.directory):
+        return os.path.abspath(args.directory)
+    else:
+        print(f"Directory `{args.directory}` not found.", file=stderr)
+        exit(1)
 
 # IMG_FOLDER = 'figs'
 # file_name = 'fig_p0=0_p1=0_p2=0.png'
@@ -93,9 +90,17 @@ fname = regex_filename_compiled.match(file_name)
 # for par, val in params:
 #     print(f' {par:5.5s} = {float(val):+.2f}')
 
-args = getArgs()
 
-print(args)
-
+# command line interface entry point for the `ndplot` script
 def cli():
-    print('pollo')
+    DIR = getDirectory()
+
+    # prepare figure
+    # fig, ax = plt.subplots(figsize=(8,5))
+    # ax.set_position([0.25, 0.02, 0.73, 0.97])
+    # ax.axis('off')
+
+    print(DIR)
+
+if __name__ == "__main__":
+    cli()
