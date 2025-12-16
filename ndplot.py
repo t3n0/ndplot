@@ -11,6 +11,7 @@ from argparse import ArgumentParser
 import matplotlib.pyplot as plt
 import re, os
 from sys import exit, stderr
+from matplotlib.widgets import Slider
 # import numpy as np
 
 @lru_cache(maxsize=256)
@@ -56,6 +57,9 @@ def loadParameters(DIR):
         if matched:
             parameters = parameterRegex.findall(filename) # findall returns a list e.g. ['3', '-0.5', '3.14']
             parameterDict[tuple(parameters)] = filename
+    if not parameterDict:
+        print("No matching images found.", file=stderr)
+        exit(1)
     return parameterDict
 
 # img = load_image(os.path.join(IMG_FOLDER, file_name))
@@ -65,14 +69,30 @@ def loadParameters(DIR):
 # command line interface entry point for the `ndplot` script
 def cli():
     DIR = getDirectory()
+    dic = loadParameters(DIR)
 
     # prepare figure
-    # fig, ax = plt.subplots(figsize=(8,5))
-    # ax.set_position([0.25, 0.02, 0.73, 0.97])
-    # ax.axis('off')
+    fig, ax = plt.subplots(figsize=(8,5))
+    ax.set_position([0.25, 0.02, 0.73, 0.97])
+    ax.axis('off')
 
-    dic = loadParameters(DIR)
-    print(dic)
+    # create sliders
+    sliders = []
+    slider_height = 0.06
+    start = 0.95
+    for i in range(3):
+        tmp_ax = plt.axes([0.03, start - i*slider_height, 0.2, 0.04])
+        # Use Slider but snap selection manually in callback
+        s = Slider(tmp_ax, f"p{i}", 0, 10, valinit=5, valstep=1.0)
+        sliders.append(s)
+    
+    def update(val=None):
+        pass
+
+    for s in sliders:
+        s.on_changed(update)
+
+    plt.show()
 
 if __name__ == "__main__":
     cli()
