@@ -59,7 +59,7 @@ def loadParameters(DIR):
             parameters = parameterRegex.findall(filename) # this is a list           ['3', '-0.5', '3.14']
             val = tuple([float(p) for p in parameters])   # cast to tuple of float    (3.0, -0.5, 3.14)
             values.append(val)                            # list of tuples           [(3.0, -0.5, 3.14), (...), ...]
-            parameterDict[val] = filename 
+            parameterDict[val] = os.path.join(DIR, filename)
     if not parameterDict:
         print("No matching images found.", file=stderr)
         exit(1)
@@ -71,22 +71,29 @@ def initSliders(vals, rangeVals):
     # This draws the slider axes and objects based on the loaded parameters.
     sliders = []
     slider_height = 0.06
-    start = 0.95
+    start = 0.9
     nParams = vals.shape[1]
     for i in range(nParams):
         tmp_ax = plt.axes([0.05, start - i*slider_height, 0.18, 0.04])
         # Use Slider but snap selection manually in callback
         s = Slider(tmp_ax, f"p{i}", rangeVals[i].min(), rangeVals[i].max(), valinit=vals[0,i])
         sliders.append(s)
+    sliders[0].label.set_fontweight('bold')
     return sliders
 
 class eventTracker:
-    def __init__(self, ax, fig, sliders, dic):
+    def __init__(self, ax, fig, sliders, dic, vals, rangeVals):
         self.ax = ax
         self.fig = fig
         self.sliders = sliders
+        self.dic = dic
+        self.vals = vals
+        self.rangeVals = rangeVals
         self.nParams = len(sliders)
         self.active_dim = 0
+        self.current_tuple = tuple(vals[0])
+        im0 = loadImage(dic[self.current_tuple])
+        self.ax.imshow(im0)
 
     def on_key(self, event):
         if event.key.isdigit():
@@ -102,6 +109,12 @@ class eventTracker:
                         s.label.set_fontweight('normal')
                 self.fig.canvas.draw_idle()
 
+    def on_scroll(self, event):
+        increment = 1 if event.button == 'up' else -1
+        max_index = self.X.shape[-1] - 1
+        self.index = np.clip(self.index + increment, 0, max_index)
+        self.update()
+
 # command line interface entry point for the `ndplot` script
 def cli():
     DIR = getDirectory()
@@ -115,10 +128,7 @@ def cli():
     # create sliders
     sliders = initSliders(vals, rangeVals)
     
-    # first image
-    im0 = loadImage(os.path.join(DIR, dic[tuple(vals[0])]))
-    
-    et = eventTracker(ax, fig, sliders, dic)
+    et = eventTracker(ax, fig, sliders, dic, vals, rangeVals)
 
     fig.canvas.mpl_connect('key_press_event', et.on_key)
     plt.show()
