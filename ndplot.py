@@ -76,10 +76,16 @@ def initSliders(vals, rangeVals):
     for i in range(nParams):
         tmp_ax = plt.axes([0.05, start - i*slider_height, 0.18, 0.04])
         # Use Slider but snap selection manually in callback
-        s = Slider(tmp_ax, f"p{i}", rangeVals[i].min(), rangeVals[i].max(), valinit=vals[0,i])
+        s = Slider(tmp_ax, f"p{i}", rangeVals[i].min(), rangeVals[i].max(), valinit=vals[0,i], valstep=rangeVals[i], initcolor='none')
         sliders.append(s)
     sliders[0].label.set_fontweight('bold')
     return sliders
+
+def new_tuple():
+    pass
+
+def nearest_tuple(current_tuple, desired_tuple):
+    pass
 
 class eventTracker:
     def __init__(self, ax, fig, sliders, dic, vals, rangeVals):
@@ -111,7 +117,11 @@ class eventTracker:
 
     def on_scroll(self, event):
         increment = 1 if event.button == 'up' else -1
-        print(f'pollo {increment}')
+        # for i in range(self.nParams):
+        #     if i == self.active_dim:
+
+        # self.rangeVals[self.active_dim]
+        
 
 # command line interface entry point for the `ndplot` script
 def cli():
@@ -126,6 +136,13 @@ def cli():
     # create sliders
     sliders = initSliders(vals, rangeVals)
     
+    # incr = 1
+    # current_tuple = vals[0]
+    # dim = 1
+    # rangeVals[dim]
+    # desired_tuple = 
+    
+
     et = eventTracker(ax, fig, sliders, dic, vals, rangeVals)
 
     fig.canvas.mpl_connect('key_press_event', et.on_key)
