@@ -111,9 +111,7 @@ class eventTracker:
 
     def on_scroll(self, event):
         increment = 1 if event.button == 'up' else -1
-        max_index = self.X.shape[-1] - 1
-        self.index = np.clip(self.index + increment, 0, max_index)
-        self.update()
+        print(f'pollo {increment}')
 
 # command line interface entry point for the `ndplot` script
 def cli():
@@ -131,6 +129,7 @@ def cli():
     et = eventTracker(ax, fig, sliders, dic, vals, rangeVals)
 
     fig.canvas.mpl_connect('key_press_event', et.on_key)
+    fig.canvas.mpl_connect('scroll_event', et.on_scroll)
     plt.show()
 
 if __name__ == "__main__":
