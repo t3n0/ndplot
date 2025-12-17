@@ -8,10 +8,10 @@ __version__ = 0.1
 from functools import lru_cache
 from PIL import Image
 from argparse import ArgumentParser
-import matplotlib.pyplot as plt
-import re, os
 from sys import exit, stderr
 from matplotlib.widgets import Slider
+import re, os
+import matplotlib.pyplot as plt
 import numpy as np
 
 @lru_cache(maxsize=256)
@@ -39,7 +39,7 @@ def getDirectory():
 
 def loadParameters(DIR):
     # This funciton defines a dictionary that couples a parameter tuple to a image file name.
-    # For example: dict[ (1.3, 45, -3, 0.5) ] = 'p1=1.3_p2=45_p3=-3_p4=0.5.png'
+    # For example: dict[ (1.3, 45, -3, 0.5) ] = '/path/to/dir/p1=1.3_p2=45_p3=-3_p4=0.5.png'
 
     # regex to identify a valid filename
     # <par1>_<par2>_..._<parN>.[png|jpg|gif]
@@ -71,12 +71,12 @@ def initSliders(vals, rangeVals):
     # This draws the slider axes and objects based on the loaded parameters.
     sliders = []
     slider_height = 0.06
-    start = 0.9
+    start = 0.15
     nParams = vals.shape[1]
     for i in range(nParams):
-        tmp_ax = plt.axes([0.05, start - i*slider_height, 0.18, 0.04])
+        tmp_ax = plt.axes([0.05, start + i*slider_height, 0.18, 0.04])
         # Use Slider but snap selection manually in callback
-        s = Slider(tmp_ax, f"p{i}", rangeVals[i].min(), rangeVals[i].max(), valinit=vals[0,i], valstep=rangeVals[i], initcolor='none')
+        s = Slider(tmp_ax, f"p{i}", rangeVals[i].min(), rangeVals[i].max(), valinit=vals[0,i], valstep=rangeVals[i], valfmt='%.1f', initcolor='none')
         sliders.append(s)
     sliders[0].label.set_fontweight('bold')
     return sliders
@@ -87,6 +87,13 @@ def indexTuple(curr, rangeVals):
         idx = np.abs(t - v).argmin()
         idxs.append(idx)
     return idxs
+
+def drawImage(fig, ax, filename):
+    if filename: # if the filename is none, don't draw anything and keep the current image
+        im = loadImage(filename)
+        ax.clear()
+        ax.imshow(im)
+        fig.canvas.draw_idle()
 
 class eventTracker:
     def __init__(self, ax, fig, sliders, dic, vals, rangeVals):
@@ -127,26 +134,25 @@ class eventTracker:
         self.currentTuple = tuple([self.rangeVals[i][self.currentIdxs[i]] for i in range(self.nParams)])
         self.sliders[self.activeDim].set_val(self.rangeVals[self.activeDim][self.currentIdxs[self.activeDim]])
         filename = self.dic.get(self.currentTuple)
-        if filename: # if the filename is none, don't draw anything and keep the current image
-            im = loadImage(filename)
-            self.ax.clear()
-            self.ax.axis('off')
-            self.ax.imshow(im)
-            self.fig.canvas.draw_idle()
+        drawImage(self.fig, self.ax, filename)
 
     def moveSlider(self, var=None):
         self.currentTuple = tuple([s.val for s in self.sliders])
         self.currentIdxs = indexTuple(self.currentTuple, self.rangeVals)
         filename = self.dic.get(self.currentTuple)
-        if filename: # if the filename is none, don't draw anything and keep the current image
-            im = loadImage(filename)
-            self.ax.clear()
-            self.ax.axis('off')
-            self.ax.imshow(im)
-            self.fig.canvas.draw_idle()
+        drawImage(self.fig, self.ax, filename)
 
 # command line interface entry point for the `ndplot` script
 def cli():
+
+    # plt style: remove ticks and labels, but keep the axes frame
+    plt.rcParams.update({
+        "xtick.bottom": False,
+        "xtick.labelbottom": False,
+        "ytick.left": False,
+        "ytick.labelleft": False,
+    })
+
     # init directory, dictionary and parameters
     DIR = getDirectory()
     dic, vals, rangeVals = loadParameters(DIR)
@@ -154,7 +160,6 @@ def cli():
     # prepare figure
     fig, ax = plt.subplots(figsize=(8,5))
     ax.set_position([0.25, 0.02, 0.73, 0.97])
-    ax.axis('off')
 
     # create sliders
     sliders = initSliders(vals, rangeVals)
