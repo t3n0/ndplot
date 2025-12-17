@@ -81,6 +81,13 @@ def initSliders(vals, rangeVals):
     sliders[0].label.set_fontweight('bold')
     return sliders
 
+def indexTuple(curr, rangeVals):
+    idxs = []
+    for t, v in zip(curr, rangeVals):
+        idx = np.abs(t - v).argmin()
+        idxs.append(idx)
+    return idxs
+
 class eventTracker:
     def __init__(self, ax, fig, sliders, dic, vals, rangeVals):
         self.ax = ax
@@ -92,6 +99,7 @@ class eventTracker:
         self.nParams = len(sliders)
         self.activeDim = 0
         self.currentTuple = tuple(vals[0])
+        self.currentIdxs = indexTuple(self.currentTuple, self.rangeVals)
         im0 = loadImage(dic[self.currentTuple])
         self.ax.imshow(im0)
 
@@ -111,16 +119,22 @@ class eventTracker:
 
     def on_scroll(self, event):
         incr = 1 if event.button == 'up' else -1
-        idxs = []
-        for t, v in zip(self.currentTuple, self.rangeVals):
-            idx = np.abs(t - v).argmin()
-            idxs.append(idx)
-        idxs[self.activeDim] += incr
-        if idxs[self.activeDim] < 0:
-            idxs[self.activeDim] = 0
-        elif idxs[self.activeDim] >= len(self.rangeVals[self.activeDim]):
-            idxs[self.activeDim] = len(self.rangeVals[self.activeDim]) - 1
-        self.currentTuple = tuple([self.rangeVals[i][idxs[i]] for i in range(self.nParams)])
+        self.currentIdxs[self.activeDim] += incr
+        if self.currentIdxs[self.activeDim] < 0:
+            self.currentIdxs[self.activeDim] = 0
+        elif self.currentIdxs[self.activeDim] >= len(self.rangeVals[self.activeDim]):
+            self.currentIdxs[self.activeDim] = len(self.rangeVals[self.activeDim]) - 1
+        self.currentTuple = tuple([self.rangeVals[i][self.currentIdxs[i]] for i in range(self.nParams)])
+        self.sliders[self.activeDim].set_val(self.rangeVals[self.activeDim][self.currentIdxs[self.activeDim]])
+        im = loadImage(self.dic[self.currentTuple])
+        self.ax.clear()
+        self.ax.axis('off')
+        self.ax.imshow(im)
+        self.fig.canvas.draw_idle()
+
+    def moveSlider(self, var=None):
+        self.currentTuple = tuple([s.val for s in self.sliders])
+        self.currentIdxs = indexTuple(self.currentTuple, self.rangeVals)
         im = loadImage(self.dic[self.currentTuple])
         self.ax.clear()
         self.ax.axis('off')
@@ -129,6 +143,7 @@ class eventTracker:
 
 # command line interface entry point for the `ndplot` script
 def cli():
+    # init directory, dictionary and parameters
     DIR = getDirectory()
     dic, vals, rangeVals = loadParameters(DIR)
 
@@ -140,8 +155,12 @@ def cli():
     # create sliders
     sliders = initSliders(vals, rangeVals)
 
+    # event tracker
     et = eventTracker(ax, fig, sliders, dic, vals, rangeVals)
 
+    # catch events
+    for s in sliders:
+        s.on_changed(et.moveSlider)
     fig.canvas.mpl_connect('key_press_event', et.on_key)
     fig.canvas.mpl_connect('scroll_event', et.on_scroll)
     plt.show()
