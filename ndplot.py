@@ -81,12 +81,6 @@ def initSliders(vals, rangeVals):
     sliders[0].label.set_fontweight('bold')
     return sliders
 
-def new_tuple():
-    pass
-
-def nearest_tuple(current_tuple, desired_tuple):
-    pass
-
 class eventTracker:
     def __init__(self, ax, fig, sliders, dic, vals, rangeVals):
         self.ax = ax
@@ -96,9 +90,9 @@ class eventTracker:
         self.vals = vals
         self.rangeVals = rangeVals
         self.nParams = len(sliders)
-        self.active_dim = 0
-        self.current_tuple = tuple(vals[0])
-        im0 = loadImage(dic[self.current_tuple])
+        self.activeDim = 0
+        self.currentTuple = tuple(vals[0])
+        im0 = loadImage(dic[self.currentTuple])
         self.ax.imshow(im0)
 
     def on_key(self, event):
@@ -106,7 +100,7 @@ class eventTracker:
             # when press a number key from 1...9
             k = int(event.key) - 1
             if 0 <= k < self.nParams:
-                self.active_dim = k
+                self.activeDim = k
                 for i, s in enumerate(self.sliders):
                     s.label.set_text(f"p{i}")
                     if i == k:
@@ -116,12 +110,22 @@ class eventTracker:
                 self.fig.canvas.draw_idle()
 
     def on_scroll(self, event):
-        increment = 1 if event.button == 'up' else -1
-        # for i in range(self.nParams):
-        #     if i == self.active_dim:
-
-        # self.rangeVals[self.active_dim]
-        
+        incr = 1 if event.button == 'up' else -1
+        idxs = []
+        for t, v in zip(self.currentTuple, self.rangeVals):
+            idx = np.abs(t - v).argmin()
+            idxs.append(idx)
+        idxs[self.activeDim] += incr
+        if idxs[self.activeDim] < 0:
+            idxs[self.activeDim] = 0
+        elif idxs[self.activeDim] >= len(self.rangeVals[self.activeDim]):
+            idxs[self.activeDim] = len(self.rangeVals[self.activeDim]) - 1
+        self.currentTuple = tuple([self.rangeVals[i][idxs[i]] for i in range(self.nParams)])
+        im = loadImage(self.dic[self.currentTuple])
+        self.ax.clear()
+        self.ax.axis('off')
+        self.ax.imshow(im)
+        self.fig.canvas.draw_idle()
 
 # command line interface entry point for the `ndplot` script
 def cli():
@@ -135,13 +139,6 @@ def cli():
 
     # create sliders
     sliders = initSliders(vals, rangeVals)
-    
-    # incr = 1
-    # current_tuple = vals[0]
-    # dim = 1
-    # rangeVals[dim]
-    # desired_tuple = 
-    
 
     et = eventTracker(ax, fig, sliders, dic, vals, rangeVals)
 
