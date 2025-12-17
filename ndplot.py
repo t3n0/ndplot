@@ -118,7 +118,7 @@ def cli():
     # first image
     im0 = loadImage(os.path.join(DIR, dic[tuple(vals[0])]))
     
-    et = eventTracker(ax, fig, sliders)
+    et = eventTracker(ax, fig, sliders, dic)
 
     fig.canvas.mpl_connect('key_press_event', et.on_key)
     plt.show()
