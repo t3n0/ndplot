@@ -3,7 +3,7 @@ ndplot
 A tool to perform n-dimensional plot from a collection of figures
 '''
 
-__version__ = 0.1
+__version__ = 0.2
 
 from functools import lru_cache
 from PIL import Image
@@ -49,25 +49,33 @@ def loadParameters(DIR):
     # regex to identify all parameters in the filename
     # <par>=<value>
     # e.g. `amp4=+1.37`
-    parameterRegex = re.compile( r"[a-zA-Z]+[0-9]*=([-+]?\d*\.?\d+)" )
+    parameterRegex = re.compile( r"([a-zA-Z]+[0-9]*)=([-+]?\d*\.?\d+)" )
 
     parameterDict = {}
     values = []
+    names = []
     for filename in sorted(os.listdir(DIR)):
         matched = filenameRegex.search(filename) # this returns a match object (or None)
         if matched:
-            parameters = parameterRegex.findall(filename) # this is a list           ['3', '-0.5', '3.14']
-            val = tuple([float(p) for p in parameters])   # cast to tuple of float    (3.0, -0.5, 3.14)
-            values.append(val)                            # list of tuples           [(3.0, -0.5, 3.14), (...), ...]
+            aux = parameterRegex.findall(filename)
+            paramNames = [aux[i][0] for i in range(len(aux))]      # this is a list           ['amp', 'p0', 'g2']
+            parameters = [aux[i][1] for i in range(len(aux))]      # this is a list           ['3', '-0.5', '3.14']
+            val = tuple([float(p) for p in parameters])            # cast to tuple of float    (3.0, -0.5, 3.14)
+            values.append(val)                                     # list of tuples           [(3.0, -0.5, 3.14), (...), ...]
+            names.append(paramNames)
             parameterDict[val] = os.path.join(DIR, filename)
     if not parameterDict:
         print("No matching images found.", file=stderr)
         exit(1)
+    sameNames = all(sub == names[0] for sub in names)
+    if not sameNames:
+        print("Some parameters have mismatching names.", file=stderr)
+        exit(1)
     values = np.asarray(values)                           # cast to np.array
     rangeValues = [np.unique(values[:, i]) for i in range(values.shape[1])]
-    return parameterDict, values, rangeValues
+    return parameterDict, values, rangeValues, paramNames
 
-def initSliders(vals, rangeVals):
+def initSliders(vals, rangeVals, paramNames):
     # This draws the slider axes and objects based on the loaded parameters.
     sliders = []
     slider_height = 0.06
@@ -76,7 +84,7 @@ def initSliders(vals, rangeVals):
     for i in range(nParams):
         tmp_ax = plt.axes([0.05, start + i*slider_height, 0.15, 0.04])
         # Use Slider but snap selection manually in callback
-        s = Slider(tmp_ax, f"p{i}", rangeVals[i].min(), rangeVals[i].max(), valinit=vals[0,i], valstep=rangeVals[i], valfmt='%.1f', initcolor='none')
+        s = Slider(tmp_ax, f"{paramNames[i]}", rangeVals[i].min(), rangeVals[i].max(), valinit=vals[0,i], valstep=rangeVals[i], valfmt='%.1f', initcolor='none')
         sliders.append(s)
     sliders[0].label.set_fontweight('bold')
     return sliders
@@ -99,13 +107,14 @@ def drawImage(fig, ax, filename):
         fig.canvas.draw_idle()
 
 class eventTracker:
-    def __init__(self, ax, fig, sliders, dic, vals, rangeVals):
+    def __init__(self, ax, fig, sliders, dic, vals, rangeVals, paramNames):
         self.ax = ax
         self.fig = fig
         self.sliders = sliders
         self.dic = dic
         self.vals = vals
         self.rangeVals = rangeVals
+        self.paramNames = paramNames
         self.nParams = len(sliders)
         self.activeDim = 0
         self.currentTuple = tuple(vals[0])
@@ -120,7 +129,7 @@ class eventTracker:
             if 0 <= k < self.nParams:
                 self.activeDim = k
                 for i, s in enumerate(self.sliders):
-                    s.label.set_text(f"p{i}")
+                    s.label.set_text(f"{self.paramNames[i]}")
                     if i == k:
                         s.label.set_fontweight('bold')
                     else:
@@ -158,7 +167,7 @@ def cli():
 
     # init directory, dictionary and parameters
     DIR = getDirectory()
-    dic, vals, rangeVals = loadParameters(DIR)
+    dic, vals, rangeVals, paramNames = loadParameters(DIR)
 
     # prepare figure
     fig, ax = plt.subplots(figsize=(8,5))
@@ -166,10 +175,10 @@ def cli():
     ax.set_title(os.path.basename(DIR))
 
     # create sliders
-    sliders = initSliders(vals, rangeVals)
+    sliders = initSliders(vals, rangeVals, paramNames)
 
     # event tracker
-    et = eventTracker(ax, fig, sliders, dic, vals, rangeVals)
+    et = eventTracker(ax, fig, sliders, dic, vals, rangeVals, paramNames)
 
     # catch events
     for s in sliders:
