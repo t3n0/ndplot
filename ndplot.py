@@ -122,24 +122,28 @@ class eventTracker:
         self.currentIdxs[self.activeDim] += incr
         if self.currentIdxs[self.activeDim] < 0:
             self.currentIdxs[self.activeDim] = 0
-        elif self.currentIdxs[self.activeDim] >= len(self.rangeVals[self.activeDim]):
+        elif self.currentIdxs[self.activeDim] > len(self.rangeVals[self.activeDim]) - 1:
             self.currentIdxs[self.activeDim] = len(self.rangeVals[self.activeDim]) - 1
         self.currentTuple = tuple([self.rangeVals[i][self.currentIdxs[i]] for i in range(self.nParams)])
         self.sliders[self.activeDim].set_val(self.rangeVals[self.activeDim][self.currentIdxs[self.activeDim]])
-        im = loadImage(self.dic[self.currentTuple])
-        self.ax.clear()
-        self.ax.axis('off')
-        self.ax.imshow(im)
-        self.fig.canvas.draw_idle()
+        filename = self.dic.get(self.currentTuple)
+        if filename: # if the filename is none, don't draw anything and keep the current image
+            im = loadImage(filename)
+            self.ax.clear()
+            self.ax.axis('off')
+            self.ax.imshow(im)
+            self.fig.canvas.draw_idle()
 
     def moveSlider(self, var=None):
         self.currentTuple = tuple([s.val for s in self.sliders])
         self.currentIdxs = indexTuple(self.currentTuple, self.rangeVals)
-        im = loadImage(self.dic[self.currentTuple])
-        self.ax.clear()
-        self.ax.axis('off')
-        self.ax.imshow(im)
-        self.fig.canvas.draw_idle()
+        filename = self.dic.get(self.currentTuple)
+        if filename: # if the filename is none, don't draw anything and keep the current image
+            im = loadImage(filename)
+            self.ax.clear()
+            self.ax.axis('off')
+            self.ax.imshow(im)
+            self.fig.canvas.draw_idle()
 
 # command line interface entry point for the `ndplot` script
 def cli():
