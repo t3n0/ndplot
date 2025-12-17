@@ -74,7 +74,7 @@ def initSliders(vals, rangeVals):
     start = 0.15
     nParams = vals.shape[1]
     for i in range(nParams):
-        tmp_ax = plt.axes([0.05, start + i*slider_height, 0.18, 0.04])
+        tmp_ax = plt.axes([0.05, start + i*slider_height, 0.15, 0.04])
         # Use Slider but snap selection manually in callback
         s = Slider(tmp_ax, f"p{i}", rangeVals[i].min(), rangeVals[i].max(), valinit=vals[0,i], valstep=rangeVals[i], valfmt='%.1f', initcolor='none')
         sliders.append(s)
@@ -89,9 +89,12 @@ def indexTuple(curr, rangeVals):
     return idxs
 
 def drawImage(fig, ax, filename):
-    if filename: # if the filename is none, don't draw anything and keep the current image
+    # if the filename is none, don't draw anything and keep the current image
+    if filename:
         im = loadImage(filename)
+        axTitle = ax.get_title() # sloppy workaround for the axes title
         ax.clear()
+        ax.set_title(axTitle)
         ax.imshow(im)
         fig.canvas.draw_idle()
 
@@ -160,6 +163,7 @@ def cli():
     # prepare figure
     fig, ax = plt.subplots(figsize=(8,5))
     ax.set_position([0.25, 0.02, 0.73, 0.97])
+    ax.set_title(os.path.basename(DIR))
 
     # create sliders
     sliders = initSliders(vals, rangeVals)
