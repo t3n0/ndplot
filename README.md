@@ -3,6 +3,7 @@
 [![GitHub Release Date](https://img.shields.io/github/release-date/t3n0/ndplot)](https://github.com/t3n0/ndplot/releases/latest)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/t3n0/ndplot)](https://github.com/t3n0/ndplot/releases/latest)
 [![GitHub all releases](https://img.shields.io/github/downloads/t3n0/ndplot/total)](https://github.com/t3n0/ndplot/releases/download/v1.0/ndplot-1.0.tar.gz)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/ndplot)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ![showcase_gif](https://raw.githubusercontent.com/t3n0/ndplot/refs/heads/main/showcase.gif)

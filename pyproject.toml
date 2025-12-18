@@ -7,7 +7,7 @@ name = "ndplot"
 dynamic = ["version"] # dynamic version
 description = "A tool to perform n-dimensional plots from a collection of figures."
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.12"
 license = "GPL-3.0-or-later"
 license-files = ["LICEN[CS]E*"]
 keywords = ["plot", "visualization", "n dimensional", "multi dimensional", "sliders", "interactive"]
@@ -31,9 +31,6 @@ version = {attr = "ndplot.__version__"}
 [project.urls]
 Repository = "https://github.com/me/ndplot.git"
 Funding = "https://buymeacoffee.com/tentacolo"
-# Homepage = "https://example.com"
-# Documentation = "https://readthedocs.org"
-# Changelog = "https://github.com/me/ndplot/blob/master/CHANGELOG.md"
 
 [project.scripts]
 ndplot = "ndplot:cli"
