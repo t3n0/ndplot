@@ -3,7 +3,7 @@ ndplot
 Generates n-dimensional interactive plots from a collection of figures.
 '''
 
-__version__ = '1.0.4'
+__version__ = '1.0.5'
 
 from functools import lru_cache
 from PIL import Image

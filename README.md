@@ -1,5 +1,6 @@
 # N-dimensional plotting: `ndplot`
 
+[![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-yellow.svg)](https://www.buymeacoffee.com/tentacolo)
 [![GitHub Release Date](https://img.shields.io/github/release-date/t3n0/ndplot)](https://github.com/t3n0/ndplot/releases/latest)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/t3n0/ndplot)](https://github.com/t3n0/ndplot/releases/latest)
 [![GitHub all releases](https://img.shields.io/github/downloads/t3n0/ndplot/total)](https://github.com/t3n0/ndplot/releases/download/v1.0/ndplot-1.0.tar.gz)
@@ -40,14 +41,20 @@ Equivalently, you can download the most recent release from [here](https://githu
 
 ## Features and performaces
 
-This tool uses a few optimizations to plot and display the graphs interactively:
+The command line tool provides the following flags:
+- `-h` prints a help dialogue;
+- `-v` prints the currently installed version;
+- `-d` input directory where the figure to be loaded are stored (optional).
+
+Also, this tool uses a few optimizations to plot and display the graphs interactively:
 - figures are "lazy loaded", i.e. the system only reads a figure when it has to be displayed. In this way, `ndplot` can handle folder with **thousand of plots** without lagging.
 - most recent figures are cached, so to further reduce I/O usage.
 - parameters do not need to be equally spaced or to cover the whole parameter manifold. `ndplot` handles empty domains of the parameter space by simply falling back to the previously shown figure.
 
 ## Support
 
-I developed this tool in my spare time as I needed something to quickly plot many many figures. If you also find it usefull please consider [buy me a coffee](https://buymeacoffee.com/tentacolo) and explore my other repos.
+I developed this tool in my spare time as I needed something to quickly plot really many figures.
+If you also find it usefull please consider [![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-yellow.svg)](https://www.buymeacoffee.com/tentacolo)
 
 ## License
 
