@@ -29,9 +29,10 @@ dependencies = [
 version = {attr = "ndplot.__version__"}
 
 [project.urls]
+Repository = "https://github.com/me/ndplot.git"
+Funding = "https://buymeacoffee.com/tentacolo"
 # Homepage = "https://example.com"
 # Documentation = "https://readthedocs.org"
-Repository = "https://github.com/me/ndplot.git"
 # Changelog = "https://github.com/me/ndplot/blob/master/CHANGELOG.md"
 
 [project.scripts]
