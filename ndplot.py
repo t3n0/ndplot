@@ -1,9 +1,9 @@
 '''
 ndplot
-A tool to perform n-dimensional plot from a collection of figures
+Generates n-dimensional interactive plots from a collection of figures.
 '''
 
-__version__ = '1.0.3'
+__version__ = '1.0.4'
 
 from functools import lru_cache
 from PIL import Image

@@ -36,7 +36,7 @@ You can install `ndplot` from the official PyPi repository using `pip`
 ```bash
 pip install ndplot
 ```
-Equivalently, you can download the most recent release from [here](https://github.com/t3n0/ndplot/releases/download/v0.2/ndplot-v0.2.zip) and install it manually.
+Equivalently, you can download the most recent release from [here](https://github.com/t3n0/ndplot/releases/download/v1.0/ndplot-1.0.tar.gz) and install it manually.
 
 ## Features and performaces
 
