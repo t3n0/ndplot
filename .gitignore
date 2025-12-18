@@ -1,5 +1,4 @@
-dist/ndplot-0.1.0-py3-none-any.whl
-dist/ndplot-0.1.0.tar.gz
+dist/ndplot*
 ndplot.egg-info/dependency_links.txt
 ndplot.egg-info/entry_points.txt
 ndplot.egg-info/PKG-INFO
