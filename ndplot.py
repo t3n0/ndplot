@@ -84,7 +84,12 @@ def initSliders(vals, rangeVals, paramNames):
     for i in range(nParams):
         tmp_ax = plt.axes([0.05, start + i*slider_height, 0.15, 0.04])
         # Use Slider but snap selection manually in callback
-        s = Slider(tmp_ax, f"{paramNames[i]}", rangeVals[i].min(), rangeVals[i].max(), valinit=vals[0,i], valstep=rangeVals[i], valfmt='%.1f', initcolor='none')
+        if rangeVals[i].min() == rangeVals[i].max():
+            s = Slider(tmp_ax, f"{paramNames[i]}", rangeVals[i].min()-0.1, rangeVals[i].max()+0.1, valinit=vals[0,i], valfmt='%.1f', initcolor='none')
+            s.active = False
+            s.poly.set_visible(False)
+        else:
+            s = Slider(tmp_ax, f"{paramNames[i]}", rangeVals[i].min(), rangeVals[i].max(), valinit=vals[0,i], valstep=rangeVals[i], valfmt='%.1f', initcolor='none')
         sliders.append(s)
     sliders[0].label.set_fontweight('bold')
     return sliders
