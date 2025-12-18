@@ -3,7 +3,7 @@ ndplot
 A tool to perform n-dimensional plot from a collection of figures
 '''
 
-__version__ = 1.0
+__version__ = '1.0.1'
 
 from functools import lru_cache
 from PIL import Image
